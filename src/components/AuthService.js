@@ -23,7 +23,7 @@ export default class AuthService {
       if (response.status === 200) {
         this.setToken(response.headers.get('Authorization')) // Setting the token in localStorage
         response.json().then(json => {
-          this.user = json;
+          this.user = json.user;
           console.log('Hello ' + this.user.name);
         });
       } else if (response.status === 401) {
@@ -65,8 +65,14 @@ export default class AuthService {
   }
 
   logout() {
-    // Clear user token and profile data from localStorage
-    localStorage.removeItem('id_token');
+    return this.fetch(`${this.domain}/api/v1/logout`, {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      body: JSON.stringify({format: 'json' })
+    }).then(
+      // Clear user token and profile data from localStorage
+      localStorage.removeItem('id_token')
+    )
   }
 
   getProfile() {
@@ -85,15 +91,12 @@ export default class AuthService {
     // Setting Authorization header
     // Authorization: Bearer xxxxxxx.xxxxxxxx.xxxxxx
     if (this.loggedIn()) {
-      headers['Authorization'] = 'Bearer ' + this.getToken()
+      headers['Authorization'] = this.getToken()
     }
 
-    return fetch(url, {
-      headers,
-      ...options
-    })
+    return fetch(url, { headers, ...options})
     .then(this._checkStatus)
-    .then(response => response.json())
+    .then(this._returnJson)
   }
 
   _checkStatus(response) {
@@ -104,6 +107,12 @@ export default class AuthService {
       var error = new Error(response.statusText)
       error.response = response
       throw error
+    }
+  }
+
+  _returnJson(response) {
+    if (response.status !== 204) {
+      return response.json()
     }
   }
 }
