@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './Login.css';
+import ayt_logo from '../askyourteam.svg';
+
 import AuthService from './AuthService';
 
 class Login extends Component {
@@ -21,14 +23,17 @@ class Login extends Component {
     return (
       <div className="center">
         <div className="card">
-          <h1>Login</h1>
-          <form onSubmit={this.handleFormSubmit}>
-            <input className="form-item" placeholder="Email" 
-                   name="email" type="text" onChange={this.handleChange}  />
-            <input className="form-item" placeholder="Password"
-                   name="password" type="password" onChange={this.handleChange} />
-            <input className="form-submit" value="SUBMIT" type="submit" />
-          </form>
+          <div className="content">
+            <img src={ayt_logo} alt="logo" />
+            <h1>Log In</h1>
+            <form onSubmit={this.handleFormSubmit}>
+              <input className="form-item" placeholder="Email"
+                     name="email" type="text" onChange={this.handleChange}  />
+              <input className="form-item" placeholder="Password"
+                     name="password" type="password" onChange={this.handleChange} />
+              <input className="form-submit" value="Log In" type="submit" />
+            </form>
+          </div>
         </div>
       </div>
     );

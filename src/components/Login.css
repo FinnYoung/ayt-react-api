@@ -1,8 +1,15 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway');
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:100,200,300,400,500&amp;subset=latin-ext');
+
+body {
+  font-family: 'Fira Sans', sans-serif;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-decoration: none;
+}
 
 .center {
-  font-family: 'Raleway', sans-serif;
-  background-color: #1abc9c;
   position: absolute;
   height: 100%;
   width: 100%;
@@ -12,39 +19,58 @@
 }
 
 .card {
-  background-color: #fff;
-  border-radius: 15px;
-  padding: 0.8rem;
+  border-radius: 4px;
+  box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.09);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
 }
 
-.card > form {
+.card > .content {
+  padding: 32px;
+}
+
+.card form {
   display: flex;
   flex-direction: column;
 }
 
 .card h1 {
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 300;
+  text-align: left;
+  color: #4a4a4a;
+  margin: 26px 0;
+}
+
+.card img {
+  margin-top: 40px;
+  margin-bottom: 0;
+  width: 72px;
+  height: 72px;
 }
 
 .form-item {
-  font-family: 'Raleway', sans-serif;
-  padding: 5px;
-  margin-bottom: 2rem;
-  height: 30px;
-  width: 16rem;
-  border: 1px solid grey;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: solid 1px #ebebeb;
+  font-size: 16px;
+  line-height: 40px;
+  text-indent: 8px;
+  margin-bottom: 24px;
 }
 
 .form-submit {
-  font-family: 'Raleway', sans-serif;
-  height: 35px;
   color: #fff;
-  background-color: #1abc9c;
+  background-color: #f36f2d;
   border: none;
-  letter-spacing: 0.2rem;
   transition: 0.3s opacity ease;
-  cursor: pointer;
+  border-radius: 4px;
+  height: 40px;
+  text-transform: unset;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 500;
 }
-.form-submit:hover { opacity: 0.6; }
+.form-submit:hover { opacity: 0.7; }
