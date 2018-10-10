@@ -6,10 +6,10 @@ export default class AuthService {
     this.fetch = this.fetch.bind(this) // React binding stuff
     this.login = this.login.bind(this)
     this.getProfile = this.getProfile.bind(this)
+    this.user = {}
   }
 
-  login(username, password) {
-    console.log(11111);
+  login(email, password) {
     // Get a token from api server using the fetch api
     return fetch(`${this.domain}/api/v1/login`, {
       method: 'POST',
@@ -18,16 +18,20 @@ export default class AuthService {
         'Content-Type': 'application/json'
       },
       credentials: 'same-origin',
-      body: JSON.stringify({format: 'json', user: { email: username, password: password } })
-    }).then(res => {
-      for(let header of res.headers){
-        console.log(header);
+      body: JSON.stringify({format: 'json', user: { email: email, password: password } })
+    }).then(response => {
+      if (response.status === 200) {
+        this.setToken(response.headers.get('Authorization')) // Setting the token in localStorage
+        response.json().then(json => {
+          this.user = json;
+          console.log('Hello ' + this.user.name);
+        });
+      } else if (response.status === 401) {
+        response.json().then(json => {
+          console.log(json);
+        });
       }
-      console.log(res);
-      console.log(res.headers);
-      console.log(res.headers.get('Authorization'));
-      this.setToken(res.token) // Setting the token in localStorage
-      return Promise.resolve(res);
+      return Promise.resolve(response);
     })
   }
 
