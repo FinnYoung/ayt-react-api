@@ -8,6 +8,9 @@ class Login extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.Auth = new AuthService();
+    this.state = {
+      user: null
+    }
   }
   componentWillMount(){
     if(this.Auth.loggedIn()) {
