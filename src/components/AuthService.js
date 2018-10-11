@@ -39,7 +39,7 @@ export default class AuthService {
   isTokenValid(token) {
     try {
       var currentDate = new Date()
-      if (token.created_at + token.expires_in > (currentDate / 1000 - currentDate.getTimezoneOffset())) {
+      if (token.created_at + token.expires_in > (currentDate / 1000)) {
         return true;
       } else {
         return false;
