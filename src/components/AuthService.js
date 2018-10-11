@@ -1,4 +1,3 @@
-import decode from 'jwt-decode';
 export default class AuthService {
   // Initializing important variables
   constructor(domain) {
@@ -10,40 +9,37 @@ export default class AuthService {
 
   login(email, password) {
     // Get a token from api server using the fetch api
-    return fetch(`${this.domain}/api/v1/login`, {
+    return fetch(this.domain + '/oauth/token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       credentials: 'same-origin',
-      body: JSON.stringify({format: 'json', user: { email: email, password: password } })
-    }).then(response => {
-      if (response.status === 200) {
-        this.setToken(response.headers.get('Authorization')) // Setting the token in localStorage
-        response.json().then(json => {
-          this.setUser(json.user)
-          console.log('Hello ' + json.user.name);
-        });
-      } else if (response.status === 401) {
-        response.json().then(json => {
-          console.log(json);
-        });
-      }
-      return Promise.resolve(response);
+      body: JSON.stringify({format: 'json', email: email, password: password, grant_type: 'password' })
+    })
+    .then(response => response.json())
+    .then(json => {
+      return this.setToken(json);
+    })
+    .then(storage => {
+      return this.fetchUser();
+    })
+    .catch(function(err) {
+      console.log(err);
     })
   }
 
   loggedIn() {
     // Checks if there is a saved token and it's still valid
     const token = this.getToken() // GEtting token from localstorage
-    return !!token && !this.isTokenExpired(token) // handwaiving here
+    return !!token && this.isTokenValid(token) // handwaiving here
   }
 
-  isTokenExpired(token) {
+  isTokenValid(token) {
     try {
-      const decoded = decode(token);
-      if (decoded.exp < Date.now() / 1000) { // Checking if token is expired. N
+      var currentDate = new Date()
+      if (token.created_at + token.expires_in > (currentDate / 1000 - currentDate.getTimezoneOffset())) {
         return true;
       } else {
         return false;
@@ -53,8 +49,15 @@ export default class AuthService {
     }
   }
 
-  setToken(idToken) {
-    localStorage.setItem('id_token', idToken)
+  setToken(token) {
+    return localStorage.setItem('token', JSON.stringify(token))
+  }
+  
+  fetchUser() {
+    return this.fetch('/api/v1/users/sync', {
+      method: 'GET',
+      credentials: 'same-origin'
+    }).then(this.setUser)
   }
 
   setUser(user) {
@@ -63,7 +66,7 @@ export default class AuthService {
 
   getToken() {
     // Retrieves the user token from localStorage
-    return localStorage.getItem('id_token')
+    return JSON.parse(localStorage.getItem('token'))
   }
 
   logout() {
@@ -77,17 +80,17 @@ export default class AuthService {
   }
 
   clearUserProfile() {
-    localStorage.removeItem('id_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
   }
 
   getProfile() {
     // Using jwt-decode npm package to decode the token
-    return decode(this.getToken());
+    return this.getToken();
   }
 
   getUser() {
-    return  JSON.parse(localStorage.getItem('user'))
+    return JSON.parse(localStorage.getItem('user'))
   }
 
   fetch(url, options) {
@@ -96,14 +99,12 @@ export default class AuthService {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     }
-
-    // Setting Authorization header
-    // Authorization: Bearer xxxxxxx.xxxxxxxx.xxxxxx
+    var access_token_param = ''
     if (this.loggedIn()) {
-      headers['Authorization'] = this.getToken()
+      access_token_param = '?access_token=' + this.getToken().access_token;
     }
 
-    return fetch(url, { headers, ...options})
+    return fetch(this.domain + url + access_token_param, { headers, ...options})
     .then(this._checkStatus)
     .then(this._returnJson)
   }
