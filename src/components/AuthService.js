@@ -94,6 +94,35 @@ export default class AuthService {
   }
 
   fetch(url, options) {
+    return this._fetch(url, options)
+        .then(response => {
+          if (response.status === 401) {
+            // renew token and resend response
+            return fetch(this.domain + '/oauth/token', {
+                  method: 'POST',
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                  credentials: 'same-origin',
+                  body: JSON.stringify({grant_type: 'refresh_token', refresh_token: this.getToken().refresh_token })
+                })
+                .then(response => response.json())
+                .then(json => {
+                  return this.setToken(json);
+                })
+                .then(storage => {
+                  return this._fetch(url, options);
+                })
+          } else {
+            return response
+          }
+        })
+        .then(this._checkStatus)
+        .then(this._returnJson)
+  }
+
+  _fetch(url, options) {
     // performs api calls sending the required authentication headers
     const headers = {
       'Accept': 'application/json',
@@ -105,8 +134,6 @@ export default class AuthService {
     }
 
     return fetch(this.domain + url + access_token_param, { headers, ...options})
-    .then(this._checkStatus)
-    .then(this._returnJson)
   }
 
   _checkStatus(response) {
