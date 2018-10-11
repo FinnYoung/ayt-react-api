@@ -6,7 +6,6 @@ export default class AuthService {
     this.fetch = this.fetch.bind(this) // React binding stuff
     this.login = this.login.bind(this)
     this.getProfile = this.getProfile.bind(this)
-    this.user = {}
   }
 
   login(email, password) {
@@ -23,8 +22,8 @@ export default class AuthService {
       if (response.status === 200) {
         this.setToken(response.headers.get('Authorization')) // Setting the token in localStorage
         response.json().then(json => {
-          this.user = json.user;
-          console.log('Hello ' + this.user.name);
+          this.setUser(json.user)
+          console.log('Hello ' + json.user.name);
         });
       } else if (response.status === 401) {
         response.json().then(json => {
@@ -55,8 +54,11 @@ export default class AuthService {
   }
 
   setToken(idToken) {
-    // Saves user token to localStorage
     localStorage.setItem('id_token', idToken)
+  }
+
+  setUser(user) {
+    localStorage.setItem('user', JSON.stringify(user))
   }
 
   getToken() {
@@ -72,6 +74,7 @@ export default class AuthService {
     }).then(
       // Clear user token and profile data from localStorage
       localStorage.removeItem('id_token')
+      localStorage.removeItem('user')
     )
   }
 
@@ -80,6 +83,9 @@ export default class AuthService {
     return decode(this.getToken());
   }
 
+  getUser() {
+    return  JSON.parse(localStorage.getItem('user'))
+  }
 
   fetch(url, options) {
     // performs api calls sending the required authentication headers

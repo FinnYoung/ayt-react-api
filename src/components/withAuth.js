@@ -16,8 +16,10 @@ export default function withAuth(AuthComponent) {
       } else {
         try {
           const profile = Auth.getProfile()
+          const user = Auth.getUser()
           this.setState({
-            user: profile
+            user: user,
+            profile: profile
           })
         } catch(err) {
           Auth.logout()
