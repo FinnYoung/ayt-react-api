@@ -70,10 +70,10 @@ export default class AuthService {
   }
 
   logout() {
-    return this.fetch(`${this.domain}/api/v1/logout`, {
-      method: 'DELETE',
+    return this.fetch('/oauth/revoke', {
+      method: 'POST',
       credentials: 'same-origin',
-      body: JSON.stringify({format: 'json' })
+      body: JSON.stringify({token: this.getToken().access_token })
     }).then(
       this.clearUserProfile()
     )

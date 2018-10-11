@@ -14,11 +14,13 @@ class Login extends Component {
       user: null
     }
   }
+
   componentWillMount(){
     if(this.Auth.loggedIn()) {
       this.props.history.replace('/');
     }
   }
+
   render() {
     return (
       <div className="center">
