@@ -72,10 +72,13 @@ export default class AuthService {
       credentials: 'same-origin',
       body: JSON.stringify({format: 'json' })
     }).then(
-      // Clear user token and profile data from localStorage
-      localStorage.removeItem('id_token')
-      localStorage.removeItem('user')
+      this.clearUserProfile()
     )
+  }
+
+  clearUserProfile() {
+    localStorage.removeItem('id_token');
+    localStorage.removeItem('user');
   }
 
   getProfile() {
